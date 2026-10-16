@@ -1724,6 +1724,9 @@
       "label": "同步喜欢",
       "description": "点击喜欢时同步为 Last.fm 的 Love / Unlove"
     },
+    "lastfmAccount": {
+      "label": "Last.fm 账号"
+    },
     "lastfm": {
       "connect": "连接账号",
       "connecting": "请在浏览器中完成授权…",
@@ -1739,6 +1742,12 @@
         "failed": "连接失败，请重试",
         "disconnected": "已断开 Last.fm 连接"
       }
+    },
+    "qmAccount": {
+      "label": "QQ 音乐账号"
+    },
+    "kgAccount": {
+      "label": "酷狗音乐账号"
     },
     "platformLogin": {
       "title": "登录 {name} 账号",
@@ -1840,6 +1849,9 @@
     "orpheusProtocol": {
       "label": "通过 Orpheus 协议唤起本应用",
       "description": "该协议通常用于官方网页端唤起官方客户端，启用后可能导致官方客户端无法被唤起"
+    },
+    "streamingServerList": {
+      "label": "媒体源管理"
     },
     "streamingEnabled": {
       "label": "启用流媒体",
@@ -1976,6 +1988,12 @@
       "confirmTitle": "清除全部数据？",
       "confirmDesc": "将清空全部歌单、登录状态、缓存并重置设置，操作不可恢复",
       "done": "全部数据已清除"
+    },
+    "pluginImport": {
+      "label": "导入插件"
+    },
+    "pluginList": {
+      "label": "已安装插件"
     },
     "plugins": {
       "securityWarningTitle": "安装前请注意安全风险",

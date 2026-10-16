@@ -1724,6 +1724,9 @@
       "label": "Sync Loves",
       "description": "Mirror your likes as Last.fm Love / Unlove"
     },
+    "lastfmAccount": {
+      "label": "Last.fm Account"
+    },
     "lastfm": {
       "connect": "Connect account",
       "connecting": "Finish authorization in your browser…",
@@ -1739,6 +1742,12 @@
         "failed": "Connection failed, please retry",
         "disconnected": "Disconnected from Last.fm"
       }
+    },
+    "qmAccount": {
+      "label": "QQ Music Account"
+    },
+    "kgAccount": {
+      "label": "Kugou Music Account"
     },
     "platformLogin": {
       "title": "Log in to {name} Account",
@@ -1840,6 +1849,9 @@
     "orpheusProtocol": {
       "label": "Wake this app via the Orpheus protocol",
       "description": "This protocol is normally used by the web player to launch the official client; enabling it may prevent the official client from being launched"
+    },
+    "streamingServerList": {
+      "label": "Media Source Management"
     },
     "streamingEnabled": {
       "label": "Enable streaming",
@@ -1976,6 +1988,12 @@
       "confirmTitle": "Clear all data?",
       "confirmDesc": "All playlists, sign-in state and caches will be wiped and settings reset. This cannot be undone.",
       "done": "All data has been cleared"
+    },
+    "pluginImport": {
+      "label": "Import Plugins"
+    },
+    "pluginList": {
+      "label": "Installed Plugins"
     },
     "plugins": {
       "securityWarningTitle": "Mind the security risks before installing",
