@@ -455,7 +455,7 @@ defineExpose({
             <!-- 普通模式 -->
             <div
               v-else
-              class="flex items-center gap-3 pl-3 pr-6 mx-3 h-10 text-sm text-on-surface-variant/60"
+              class="flex items-center gap-3 pl-3 pr-6 mx-3 h-10 border-2 border-solid border-transparent text-sm text-on-surface-variant/60"
             >
               <div v-if="showIndex" class="w-8 shrink-0 flex items-center justify-center">
                 <span>#</span>
@@ -515,7 +515,7 @@ defineExpose({
                 </div>
               </div>
               <div v-if="showAlbum" class="flex-1 min-w-0">{{ t("songList.album") }}</div>
-              <div class="shrink-0 text-center text-xs leading-6" style="min-width: fit-content">
+              <div class="w-12 shrink-0 text-center whitespace-nowrap">
                 {{ t("songList.actions") }}
               </div>
               <div v-if="showDuration" class="w-16 shrink-0 text-center">
@@ -702,7 +702,7 @@ defineExpose({
               <!-- 收藏 -->
               <div
                 v-if="!batch.active.value && item.source !== 'plugin'"
-                class="w-7 shrink-0 flex items-center justify-center"
+                class="w-12 shrink-0 flex items-center justify-center"
                 @click.stop
               >
                 <SButton
@@ -722,7 +722,7 @@ defineExpose({
                   </template>
                 </SButton>
               </div>
-              <div v-else class="w-7 shrink-0" />
+              <div v-else class="w-12 shrink-0" />
               <!-- 时长 -->
               <div
                 v-if="showDuration"

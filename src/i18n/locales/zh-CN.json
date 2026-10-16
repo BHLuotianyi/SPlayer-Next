@@ -1192,15 +1192,19 @@
     },
     "adaptiveFontSize": {
       "label": "自适应字号",
-      "description": "歌词字号根据窗口大小自动调整"
+      "description": "歌词字号随窗口高度调整"
     },
     "fontSize": {
       "label": "歌词字号",
-      "description": "关闭自适应后生效"
+      "description": "主行文字大小"
+    },
+    "translationFontSizeFollowMain": {
+      "label": "副行字号跟随主行",
+      "description": "副行字号为主行的一半"
     },
     "translationFontSize": {
       "label": "翻译/音译字号",
-      "description": "翻译与音译副行的字号，自适应开启时作为基准大小 (以 1080p 高度为准)"
+      "description": "关闭跟随主行后生效"
     },
     "fontWeight": {
       "label": "歌词字重",

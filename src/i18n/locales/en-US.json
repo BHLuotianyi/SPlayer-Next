@@ -1192,15 +1192,19 @@
     },
     "adaptiveFontSize": {
       "label": "Adaptive Font Size",
-      "description": "Auto-adjust lyric font size based on window size"
+      "description": "Adjust lyric size with window height"
     },
     "fontSize": {
       "label": "Font Size",
-      "description": "Effective when adaptive is off"
+      "description": "Main lyric text size"
+    },
+    "translationFontSizeFollowMain": {
+      "label": "Follow Main Lyric Font Size",
+      "description": "Use half the main lyric font size"
     },
     "translationFontSize": {
       "label": "Translation Font Size",
-      "description": "Font size of translated/romanized sub-lines; used as the base size (1080p) when adaptive is on"
+      "description": "Used when following main size is off"
     },
     "fontWeight": {
       "label": "Font Weight",
