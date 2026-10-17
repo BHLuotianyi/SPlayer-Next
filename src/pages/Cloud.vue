@@ -1,4 +1,6 @@
 <script setup lang="ts">
+defineOptions({ name: "Cloud" });
+
 import type { PlaybackContext } from "@shared/types/player";
 import type { DropdownMenuItem } from "@/components/ui/SDropdownMenu.vue";
 import { useUserStore } from "@/stores/user";
@@ -41,7 +43,7 @@ const trackCount = computed(() => user.cloudCount || user.cloudTracks.length);
 
 const handlePlayAll = (): void => {
   if (user.cloudTracks.length === 0) return;
-  player.playFrom(user.cloudTracks, 0, playbackContext.value);
+  player.playFrom(user.cloudTracks, { context: playbackContext.value });
 };
 
 const songListRef = shallowRef<InstanceType<typeof SongList> | null>(null);

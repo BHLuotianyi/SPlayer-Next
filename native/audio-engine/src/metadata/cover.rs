@@ -5,6 +5,8 @@ use std::path::Path;
 
 use ffmpeg_audio::AudioReader;
 
+use super::folder_cover::find_folder_cover;
+
 /// 缩略图最大边长（px）
 const THUMB_SIZE: u32 = 300;
 
@@ -16,7 +18,12 @@ pub fn cover_thumb_path(source: &str, cache_dir: &str) -> std::path::PathBuf {
     Path::new(cache_dir).join(format!("cover_{hash:016x}_thumb.jpg"))
 }
 
-/// 从 reader 中提取封面缩略图，写入缓存目录，返回缩略图路径
+/// 从 reader 中提取封面缩略图，写入缓存目录，返回缩略图路径。
+/// 当音频文件无内嵌封面时，回退到同目录下的封面图片文件。
+///
+/// @param reader - 音频读取器
+/// @param source - 音频文件路径
+/// @param cache_dir - 缩略图缓存目录
 pub fn extract_cover_thumbnail(
     reader: &AudioReader,
     source: &str,
@@ -28,9 +35,13 @@ pub fn extract_cover_thumbnail(
         return Some(thumb_file.to_string_lossy().into_owned());
     }
 
-    let cover = reader.cover()?;
+    // 内嵌封面优先，无则回退同目录封面图片
+    let data = reader
+        .cover()
+        .map(|cover| cover.data)
+        .or_else(|| find_folder_cover(source).and_then(|p| std::fs::read(p).ok()))?;
     std::fs::create_dir_all(cache_dir).ok()?;
-    generate_cover_thumbnail(&cover.data, &thumb_file).ok()?;
+    generate_cover_thumbnail(&data, &thumb_file).ok()?;
 
     Some(thumb_file.to_string_lossy().into_owned())
 }
@@ -62,41 +73,5 @@ fn generate_cover_thumbnail(
 }
 
 #[cfg(test)]
-mod tests {
-    use super::*;
-    use std::sync::atomic::{AtomicU64, Ordering};
-
-    static TEST_FILE_COUNTER: AtomicU64 = AtomicU64::new(0);
-
-    fn test_output_path(name: &str) -> std::path::PathBuf {
-        let sequence = TEST_FILE_COUNTER.fetch_add(1, Ordering::Relaxed);
-        std::env::temp_dir().join(format!(
-            "splayer-metadata-{}-{sequence}-{name}",
-            std::process::id()
-        ))
-    }
-
-    #[test]
-    fn invalid_cover_does_not_create_fake_jpeg() {
-        let output = test_output_path("invalid.jpg");
-        let _ = std::fs::remove_file(&output);
-
-        assert!(generate_cover_thumbnail(b"not an image", &output).is_err());
-        assert!(!output.exists());
-    }
-
-    #[test]
-    fn png_cover_is_encoded_as_jpeg() {
-        let output = test_output_path("converted.jpg");
-        let mut png = Cursor::new(Vec::new());
-        image::DynamicImage::new_rgb8(2, 2)
-            .write_to(&mut png, image::ImageFormat::Png)
-            .unwrap();
-
-        generate_cover_thumbnail(png.get_ref(), &output).unwrap();
-
-        let cached = std::fs::read(&output).unwrap();
-        assert!(cached.starts_with(&[0xff, 0xd8, 0xff]));
-        let _ = std::fs::remove_file(output);
-    }
-}
+#[path = "tests/cover.rs"]
+mod tests;

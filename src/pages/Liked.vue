@@ -1,4 +1,6 @@
 <script setup lang="ts">
+defineOptions({ name: "Liked" });
+
 import type { PlaybackContext, Track } from "@shared/types/player";
 import type { ContentScope } from "@/types/collection";
 import type { DropdownMenuItem } from "@/components/ui/SDropdownMenu.vue";
@@ -72,7 +74,7 @@ const playbackContext = computed<PlaybackContext | undefined>(() => {
 
 const handlePlayAll = (): void => {
   if (currentTracks.value.length === 0) return;
-  player.playFrom(currentTracks.value, 0, playbackContext.value);
+  player.playFrom(currentTracks.value, { context: playbackContext.value });
 };
 
 onMounted(() => {

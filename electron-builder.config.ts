@@ -1,12 +1,28 @@
 import type { Configuration } from "electron-builder";
 import { readFileSync } from "node:fs";
+import { SUPPORTED_AUDIO_EXTENSIONS } from "./shared/utils/audioFile";
+
+/** 音频后缀注册为文件关联 */
+const fileAssociations = [...SUPPORTED_AUDIO_EXTENSIONS].map((extension) => {
+  const ext = extension.slice(1);
+  return {
+    ext,
+    description: `${ext.toUpperCase()} Audio File`,
+    role: "Viewer" as const,
+  };
+});
 
 const packageVersion = JSON.parse(readFileSync("package.json", "utf8")).version as string;
-const prereleaseChannel = /-(alpha|beta)(?:\.|$)/.exec(packageVersion)?.[1];
+const prereleaseChannel = /-(alpha|beta|nightly)(?:\.|$)/.exec(packageVersion)?.[1];
 const inferredUpdateChannel = prereleaseChannel ?? "latest";
 const updateChannel = process.env.UPDATE_CHANNEL ?? inferredUpdateChannel;
 
-if (updateChannel !== "latest" && updateChannel !== "beta" && updateChannel !== "alpha") {
+if (
+  updateChannel !== "latest" &&
+  updateChannel !== "beta" &&
+  updateChannel !== "alpha" &&
+  updateChannel !== "nightly"
+) {
   throw new Error(`不支持的更新通道: ${updateChannel}`);
 }
 if (packageVersion.includes("-") && !prereleaseChannel) {
@@ -21,12 +37,15 @@ const config: Configuration = {
   productName: "SPlayer-Next",
   copyright: "Copyright © imsyy 2025",
   directories: { buildResources: "public" },
+  fileAssociations,
   afterPack: "./scripts/after-pack.ts",
   compression: "maximum",
   generateUpdatesFilesForAllChannels: true,
   files: [
     "public/**",
-    "out/**",
+    "out/main/**",
+    "out/preload/**",
+    "out/renderer/**",
     "!**/.vscode/*",
     "!src/**",
     "!native/**",
@@ -78,6 +97,17 @@ const config: Configuration = {
       to: "native",
       filter: ["*.node"],
     },
+    {
+      from: "native/opencc",
+      to: "native",
+      filter: ["*.node"],
+    },
+  ],
+  extraFiles: [
+    {
+      from: "LICENSE",
+      to: "LICENSE",
+    },
   ],
   win: {
     executableName: "SPlayer-Next",
@@ -90,8 +120,13 @@ const config: Configuration = {
   nsis: {
     oneClick: false,
     guid: "top.imsyy.splayer-next",
-    installerIcon: "public/icons/favicon.ico",
-    uninstallerIcon: "public/icons/favicon.ico",
+    installerIcon: "public/icons/logo.ico",
+    uninstallerIcon: "public/icons/logo.ico",
+    installerHeader: "build/installer/header.bmp",
+    installerSidebar: "build/installer/sidebar.bmp",
+    uninstallerSidebar: "build/installer/sidebar.bmp",
+    include: "build/installer/installer.nsh",
+    installerLanguages: ["en_US", "zh_CN"],
     artifactName: "${productName}-${version}-${arch}-setup.${ext}",
     shortcutName: "SPlayer Next",
     uninstallDisplayName: "SPlayer Next",
