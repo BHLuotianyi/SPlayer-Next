@@ -17,6 +17,7 @@ export interface QMAudioInfo {
     size_ape?: number;
     size_flac?: number;
     size_192ogg?: number;
+    size_hires?: number;
     size_new?: number[];
     hires_sample?: number;
     hires_bitdepth?: number;
@@ -56,7 +57,7 @@ export const normalizeQMSong = (song: QMAudioInfo, albumMid = ""): QMSong => {
     sizeApe: song.file?.size_ape ?? 0,
     sizeFlac: song.file?.size_flac ?? 0,
     sizeOgg: song.file?.size_192ogg ?? 0,
-    sizeHiRes: song.file?.size_new?.[0] ?? 0,
+    sizeHiRes: song.file?.size_hires || song.file?.size_new?.[0] || 0,
     hiResSampleRate: song.file?.hires_sample ?? 0,
     hiResBitDepth: song.file?.hires_bitdepth ?? 0,
     cover: pictureMid ? `https://y.gtimg.cn/music/photo_new/T002R300x300M000${pictureMid}.jpg` : "",

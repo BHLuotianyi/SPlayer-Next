@@ -62,19 +62,29 @@ const createSearchId = (): string => {
 const searchMobile = (keywords: string, page: number, limit: number, searchType: number) =>
   qmRequest<MobileSearchResponse>(
     "music.search.SearchCgiService",
-    "DoSearchForQQMusicMobile",
+    "DoSearchForQQMusicLite",
     {
-      searchid: createSearchId(),
+      search_id: createSearchId(),
+      remoteplace: "search.android.keyboard",
       query: keywords,
       page_num: page,
       num_per_page: limit,
       search_type: searchType,
-      highlight: true,
+      highlight: 0,
+      nqc_flag: 0,
+      page_id: 1,
       grp: 1,
-      selectors: {},
-      vec_selectors: [],
     },
-    { session: false },
+    {
+      session: false,
+      auth: false,
+      signed: true,
+      comm: {
+        tmeAppID: "qqmusiclight",
+        cv: "1003006",
+        v: "1003006",
+      },
+    },
   );
 
 /**
