@@ -57,6 +57,8 @@ export interface PlayerSettings {
   loudnessNormalization: boolean;
   /** 音频输出模式：共享（默认）/ WASAPI 独占（仅 Windows） */
   audioOutputMode: AudioOutputMode;
+  /** 播放页展开且正在播放时保持屏幕常亮 */
+  keepScreenAwake: boolean;
   /** 均衡器配置 */
   equalizer: EqualizerSettings;
   /** 按 `{Track.id}|{歌词源}` 记忆的歌词偏移（ms，正值为歌词提前）；为 0 时不写入 */

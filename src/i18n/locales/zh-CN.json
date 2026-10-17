@@ -1229,6 +1229,10 @@
       "label": "自动沉浸模式",
       "description": "鼠标静止或离开窗口时，自动隐藏全屏播放器顶/底栏与鼠标"
     },
+    "keepScreenAwake": {
+      "label": "播放时保持屏幕常亮",
+      "description": "仅在播放页展开时生效"
+    },
     "showTranslation": {
       "label": "显示翻译",
       "description": "显示歌词的翻译文本"

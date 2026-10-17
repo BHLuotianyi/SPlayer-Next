@@ -125,15 +125,14 @@ const classifyLoadError = (error: unknown, source: string): ErrorCode => {
 
 /**
  * 播放器原生事件回调
- * @param inst 播放器实例
+ * @param inst - 播放器实例
  */
 const registerNativeEvents = (inst: InstanceType<AudioEngineModule["AudioPlayer"]>): void => {
   inst.onEvent((event: JsPlayerEvent) => {
     switch (event.type) {
       case "stateChanged": {
         const state = (event.state ?? "idle") as PlayerState;
-        // 播放中阻止系统休眠，暂停/停止时释放唤醒锁，保证系统可正常休眠
-        updatePowerBlocker(state === "playing" || state === "loading");
+        updatePowerBlocker(state);
         // 更新缩略图工具栏和托盘菜单
         getThumbar()?.updateThumbar(state === "playing");
         setTrayPlayState(state === "playing" ? "playing" : "paused");
@@ -170,6 +169,7 @@ const registerNativeEvents = (inst: InstanceType<AudioEngineModule["AudioPlayer"
         break;
       }
       case "ended": {
+        updatePowerBlocker("stopped");
         sendToMain("player:event", { type: "ended" });
         wsBroadcast({ type: "ended" });
         mediaService.setPlayState({ status: "Paused" });
@@ -180,6 +180,7 @@ const registerNativeEvents = (inst: InstanceType<AudioEngineModule["AudioPlayer"
         break;
       }
       case "sourceError": {
+        updatePowerBlocker("stopped");
         // 音源失效（网络中断 / URL 过期）
         sendToMain("player:event", { type: "sourceError" });
         mediaService.setPlayState({ status: "Paused" });
