@@ -923,10 +923,6 @@
       "label": "预载下一首歌曲",
       "description": "提前缓存并解码下一曲，可能会增加网络占用"
     },
-    "preventSleep": {
-      "label": "阻止系统息屏",
-      "description": "全屏播放器播放时阻止系统进入息屏状态"
-    },
     "outputDevice": {
       "label": "输出设备",
       "description": "选择音频输出设备",
@@ -1232,6 +1228,10 @@
     "autoImmersive": {
       "label": "自动沉浸模式",
       "description": "鼠标静止或离开窗口时，自动隐藏全屏播放器顶/底栏与鼠标"
+    },
+    "keepScreenAwake": {
+      "label": "播放时保持屏幕常亮",
+      "description": "仅在播放页展开时生效"
     },
     "showTranslation": {
       "label": "显示翻译",

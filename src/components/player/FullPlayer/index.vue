@@ -21,7 +21,6 @@ const settings = useSettingsStore();
 const fav = useFavorite();
 const { enqueue: enqueueDownload } = useDownload();
 const { t } = useI18n();
-const isDesktop = computed(() => window.api.system.installType !== undefined);
 const {
   isPlaying,
   isLoading,
@@ -117,19 +116,6 @@ watch(
     });
   },
 );
-
-// 阻止系统息屏（Electron）
-watch(
-  () => settings.player.preventSleep,
-  (val) => {
-    if (isDesktop.value) window.api.system.preventSleep(val);
-  },
-  { immediate: true },
-);
-
-onBeforeUnmount(() => {
-  if (isDesktop.value) window.api.system.preventSleep(false);
-});
 
 const fullscreenCover = computed(() => settings.player.coverLayout === "fullscreen");
 const coverWidth = computed(() => `${settings.player.coverLyricRatio * 100}%`);

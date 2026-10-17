@@ -275,8 +275,6 @@ export interface PlayerSettings {
   showLyricInBar: boolean;
   /** 播放时提前获取下一首的播放数据 */
   preloadNextTrack: boolean;
-  /** 全屏播放器播放时阻止系统息屏 */
-  preventSleep: boolean;
   /** 相邻曲目的播放过渡方式 */
   transitionMode: "none" | "crossfade";
   /** 曲尾交接时机与淡化时长偏好 */

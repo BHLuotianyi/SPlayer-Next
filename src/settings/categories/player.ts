@@ -159,12 +159,6 @@ const playerCategory: SettingCategory = {
           childrenCondition: () => useSettingsStore().player.transitionMode === "crossfade",
           hideChildren: true,
         },
-        {
-          key: "preventSleep",
-          type: "switch",
-          binding: { store: "settings", path: "player.preventSleep" },
-          defaultValue: false,
-        },
       ],
     },
     {

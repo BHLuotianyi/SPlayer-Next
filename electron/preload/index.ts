@@ -242,8 +242,6 @@ const api = {
     // 拉取冷启动暂存的 orpheus 唤起 URL
     consumePendingProtocolUrl: (): Promise<string | null> =>
       ipcRenderer.invoke("system:consumePendingProtocolUrl"),
-    // 阻止系统息屏
-    preventSleep: (val: boolean) => ipcRenderer.send("system:preventSleep", val),
     // 订阅主进程下发的外部音频文件打开列表
     onOpenFiles: (callback: (files: string[]) => void) =>
       subscribe<string[]>("system:open-files", callback),
@@ -324,6 +322,12 @@ const api = {
     ready: (): Promise<void> => ipcRenderer.invoke("window:ready"),
     startupComplete: (): Promise<void> => ipcRenderer.invoke("window:startupComplete"),
     startupFailed: (error: string): void => ipcRenderer.send("window:startupFailed", error),
+    /**
+     * 同步播放页展开状态
+     * @param expanded - 播放页是否展开
+     */
+    setPlayerExpanded: (expanded: boolean): void =>
+      ipcRenderer.send("window:setPlayerExpanded", expanded),
     // 切换桌面歌词窗口
     toggleDesktopLyric: () => ipcRenderer.invoke("window:toggleDesktopLyric"),
     // 关闭桌面歌词窗口

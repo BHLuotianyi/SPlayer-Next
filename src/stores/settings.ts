@@ -153,7 +153,6 @@ export const useSettingsStore = defineStore(
       snapToLyric: false,
       showLyricInBar: true,
       preloadNextTrack: false,
-      preventSleep: false,
       transitionMode: "none",
       transitionPreference: "standard",
       searchPlayBehavior: "current",
