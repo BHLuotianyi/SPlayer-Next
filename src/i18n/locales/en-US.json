@@ -1637,6 +1637,10 @@
       "slide": "Slide",
       "zoom": "Zoom"
     },
+    "reduceMotion": {
+      "label": "Reduce Motion",
+      "description": "Reduce interface motion and resource usage"
+    },
     "seamlessTransition": {
       "label": "Shared Element Transitions",
       "description": "Seamlessly transition elements between two pages"

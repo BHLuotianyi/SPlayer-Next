@@ -14,6 +14,10 @@ interface RippleElement extends HTMLElement {
   [RIPPLE_HANDLER]?: (e: PointerEvent) => void;
 }
 
+/**
+ * 注册按压涟漪，减弱动画时跳过节点创建与动画调度
+ * @param el - 绑定涟漪的元素
+ */
 const setupRipple = (el: RippleElement) => {
   if (el[RIPPLE_HANDLER]) return;
 
@@ -24,6 +28,7 @@ const setupRipple = (el: RippleElement) => {
   el.style.overflow = "hidden";
 
   const handler = (e: PointerEvent) => {
+    if (document.documentElement.hasAttribute("data-reduced-motion")) return;
     const rect = el.getBoundingClientRect();
     const radius = Math.sqrt(rect.width ** 2 + rect.height ** 2);
     const size = radius * 2;

@@ -43,6 +43,7 @@ const playerVisible = ref(false);
 const visualizerMounted = ref(false);
 const initialLyricTimeMs = ref(0);
 let visualizerMountFrame = 0;
+let enterPrepared = false;
 
 /** 加载中的歌曲使用队列当前项兜底，避免全屏播放器出现空白 */
 const displayTrack = computed(() => media.track ?? status.currentTrack);
@@ -56,8 +57,10 @@ const { start: startTick, stop: stopTick } = usePlaybackTime((currentMs) => {
   }
 });
 
-/** 展开后 */
-const onAfterEnter = () => {
+/** 每次展开只准备一次内容，减弱动画时提前挂载以融入面板过渡 */
+const preparePlayerContent = (): void => {
+  if (enterPrepared) return;
+  enterPrepared = true;
   initialLyricTimeMs.value = getCurrentTime() + status.lyricOffsetMs;
   lyricMounted.value = true;
   nextTick(() => {
@@ -73,6 +76,13 @@ const onAfterEnter = () => {
       });
     });
   });
+};
+
+/** 展开前显示背景，并在轻量过渡期间准备歌词与可视化内容 */
+const onBeforeEnter = (): void => {
+  playerVisible.value = true;
+  enterPrepared = false;
+  if (settings.reducedMotion) preparePlayerContent();
 };
 
 /** 收起前 */
@@ -207,14 +217,14 @@ const showComments = (): void => {
       leave-active-class="transition-transform duration-500 ease-[cubic-bezier(0.7,0,0.3,1)]"
       enter-from-class="translate-y-full"
       leave-to-class="translate-y-full"
-      @after-enter="onAfterEnter"
-      @before-enter="playerVisible = true"
+      @after-enter="preparePlayerContent"
+      @before-enter="onBeforeEnter"
       @before-leave="onBeforeLeave"
       @after-leave="onAfterLeave"
     >
       <div
         v-show="isPlayerExpanded"
-        class="fixed inset-0 z-200 overflow-hidden text-cover"
+        class="player-panel fixed inset-0 z-200 overflow-hidden text-cover"
         :class="immersive ? 'cursor-none [&_*]:!cursor-none' : ''"
         style="--lp-color: rgb(var(--s-cover))"
         @mouseenter="onPlayerMouseEnter"

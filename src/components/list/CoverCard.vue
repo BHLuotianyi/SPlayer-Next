@@ -45,7 +45,7 @@ const actualFallback = computed(() => (props.type === "artist" ? artistFallback 
         :src="item.cover"
         :fallback="actualFallback"
         :alt="item.title"
-        class="w-full aspect-square transition-[transform,filter] duration-300 ease-out group-hover:scale-108 group-hover:brightness-80"
+        class="cover-card-image w-full aspect-square transition-[transform,filter] duration-300 ease-out group-hover:scale-108 group-hover:brightness-80"
         :class="coverRounded"
       />
       <!-- 播放按钮 -->

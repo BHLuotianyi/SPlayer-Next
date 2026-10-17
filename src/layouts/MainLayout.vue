@@ -90,7 +90,7 @@ const handleAfterEnter = (): void => {
 
 let disposeCoverTransitions: (() => void) | undefined;
 watch(
-  () => appearance.seamlessTransition,
+  () => appearance.seamlessTransition && !settings.reducedMotion,
   (enabled) => {
     disposeCoverTransitions?.();
     disposeCoverTransitions = enabled
@@ -148,7 +148,7 @@ const playerBarInnerClass = computed(() => {
 <template>
   <!-- 主界面 -->
   <div
-    class="h-screen flex overflow-hidden bg-app text-on-surface transition-[transform,opacity] duration-500 ease-[cubic-bezier(0.7,0,0.3,1)] origin-center"
+    class="player-shell h-screen flex overflow-hidden bg-app text-on-surface transition-[transform,opacity] duration-500 ease-[cubic-bezier(0.7,0,0.3,1)] origin-center"
     :class="isPlayerExpanded && fullPlayerReady ? 'scale-95 opacity-0 pointer-events-none' : ''"
   >
     <!-- 侧边栏 -->

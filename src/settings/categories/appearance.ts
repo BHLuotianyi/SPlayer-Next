@@ -167,6 +167,12 @@ const appearanceCategory: SettingCategory = {
       id: "softwareAnimations",
       items: [
         {
+          key: "reduceMotion",
+          type: "switch",
+          binding: { store: "settings", path: "appearance.reduceMotion" },
+          defaultValue: false,
+        },
+        {
           key: "routeTransition",
           type: "select",
           binding: { store: "settings", path: "appearance.routeTransition" },
