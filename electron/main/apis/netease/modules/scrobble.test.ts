@@ -13,7 +13,7 @@ const createRequest = () => {
   return { calls, request };
 };
 
-describe("网易云原版日志听歌打卡", () => {
+describe("NCM 原版日志听歌打卡", () => {
   const sourceCases = [
     ["list", "song", "list"],
     ["album", "song", "album"],

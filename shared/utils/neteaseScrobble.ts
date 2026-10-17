@@ -16,7 +16,7 @@ export interface NeteaseScrobbleTrack {
 }
 
 /**
- * 计算网易云听歌打卡阈值，短音频同样在播放过半后上报
+ * 计算 NCM 听歌打卡阈值，短音频同样在播放过半后上报
  * @param durationSec - 音频总时长（秒）
  * @returns 触发上报所需的累计播放毫秒数
  */
@@ -45,11 +45,11 @@ const toNeteaseSourceType = (type: PlaybackOriginType): NeteaseScrobbleSourceTyp
 };
 
 /**
- * 从播放曲目生成网易云打卡元数据
+ * 从播放曲目生成 NCM 打卡元数据
  * @param track - 当前播放曲目
  * @param context - 本次播放的来源上下文
  * @param durationMs - 引擎确认后的时长
- * @returns 网易云曲目返回打卡元数据，其余来源返回 null
+ * @returns NCM 曲目返回打卡元数据，其余来源返回 null
  */
 export const toNeteaseScrobbleTrack = (
   track: Track | null,

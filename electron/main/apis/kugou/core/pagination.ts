@@ -1,41 +1,43 @@
-/**
- * KG 分页拉取辅助
- *
- * 酷狗歌单/专辑接口按 page 分页返回，此模块封装「先取第一页拿 total，
- * 再并发补拉剩余页」的全量拉取逻辑，供 playlist / album 模块复用。
- */
-
-/** special/song 单页条数（保持接口示例值，翻页逻辑负责取全量） */
-export const SONG_PAGESIZE = 300;
-
-/** 单个歌单/专辑最多拉取的歌曲数，防止异常 total 无限翻页 */
-export const MAX_SONGS = 5000;
-
-/** 分页响应的 data 结构 */
-export interface PagedResponse<T> {
-  data?: { info?: T[]; total?: number };
+/** 分页响应经过接口适配后的数据 */
+export interface KGPage<T> {
+  items: T[];
+  total?: number;
 }
 
 /**
- * 拉取全量分页数据：先取第一页拿 total，再并发补拉剩余页
- * @param requestPage - 页码 → 该页响应的请求函数
- * @returns 全量条目；个别补拉页失败时返回已拿到的部分
+ * 按顺序拉取完整列表，限制并发并向调用方传播失败
+ * @param requestPage - 按页码请求并适配接口数据
+ * @param pageSize - 当前接口使用的单页条数
+ * @returns 全量条目和服务端总数
  */
 export const fetchAllPages = async <T>(
-  requestPage: (page: number) => Promise<PagedResponse<T>>,
-): Promise<T[]> => {
+  requestPage: (page: number) => Promise<KGPage<T>>,
+  pageSize: number,
+): Promise<{ items: T[]; total: number }> => {
   const first = await requestPage(1);
-  const firstItems = first.data?.info ?? [];
-  const total = Math.min(first.data?.total ?? firstItems.length, MAX_SONGS);
-  const restCount = total - firstItems.length;
-  if (restCount <= 0) return firstItems;
+  const items = first.items;
 
-  const pages = Math.ceil(restCount / SONG_PAGESIZE);
-  const rest = await Promise.all(
-    Array.from({ length: pages }, (_, i) =>
-      requestPage(i + 2).catch(() => ({ data: {} as never })),
-    ),
-  );
-  const merged = [...firstItems, ...rest.flatMap((r) => r.data?.info ?? [])];
-  return merged.slice(0, total);
+  if (first.total === undefined) {
+    let page = 1;
+    let pageLength = items.length;
+    while (pageLength === pageSize) {
+      const next = await requestPage(++page);
+      items.push(...next.items);
+      pageLength = next.items.length;
+    }
+    return { items, total: items.length };
+  }
+
+  const pageCount = Math.ceil(first.total / pageSize);
+  for (let page = 2; page <= pageCount; page += 3) {
+    const pages = await Promise.all(
+      Array.from({ length: Math.min(3, pageCount - page + 1) }, (_, index) =>
+        requestPage(page + index),
+      ),
+    );
+    for (const result of pages) items.push(...result.items);
+  }
+
+  if (items.length < first.total) throw new Error("KG 列表数据不完整，请重试");
+  return { items: items.slice(0, first.total), total: first.total };
 };

@@ -16,7 +16,7 @@ let lastPositionMs = 0;
 /** 当前播放轮次，用于丢弃旧请求回包 */
 let cycleId = 0;
 
-/** 是否看起来是网易云登录态 */
+/** 是否看起来是 NCM 登录态 */
 const isLoggedIn = (): boolean => Boolean(getNeteaseCookies().MUSIC_U);
 
 /** 听歌打卡是否启用 */

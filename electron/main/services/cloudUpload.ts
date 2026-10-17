@@ -3,7 +3,7 @@
  *
  * 查重后按 needUpload 分流
  * - 需真上传:申请 token → 取 NOS 服务器 → 流式直传 → 提交信息 → 发布
- * - 秒传(文件已在网易曲库):走导入接口(check/v2 + user/song/import),不申请 token、不传字节
+ * - 秒传(文件已在 NCM 曲库):走导入接口(check/v2 + user/song/import),不申请 token、不传字节
  */
 
 import http from "node:http";

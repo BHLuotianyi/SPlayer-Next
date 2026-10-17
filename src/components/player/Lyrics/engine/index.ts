@@ -17,7 +17,6 @@ import {
   type InterludeCache,
 } from "./interlude";
 
-export type { RendererConfig } from "./constants";
 import type { RendererConfig } from "./constants";
 
 export class LyricRenderer {

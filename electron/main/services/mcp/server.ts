@@ -224,7 +224,7 @@ const createServer = (): McpServer => {
     "search_online_songs",
     {
       title: "搜索在线歌曲",
-      description: "按关键词搜索网易云音乐、QQ 音乐或KG音乐，返回可直接传给 play_track 的曲目",
+      description: "按关键词搜索指定在线平台，返回可直接传给 play_track 的曲目",
       inputSchema: {
         platform: z.enum(["netease", "qqmusic", "kugou"]),
         query: z.string().trim().min(1).max(200),
@@ -333,5 +333,3 @@ const createServer = (): McpServer => {
 
 /** 创建 SPlayer MCP HTTP 端点 */
 export const createMcpEndpoint = (): McpEndpoint => createHttpEndpoint(createServer);
-
-export type { McpEndpoint } from "./endpoint";

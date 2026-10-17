@@ -40,7 +40,7 @@ import type {
   ShuffleMode,
   PlayerState,
 } from "@shared/types/player";
-import type { MediaEvent } from "@main/services/media";
+import type { MediaEvent } from "@splayer/media-ctrl";
 import { JsPlayerEvent } from "@splayer/audio-engine";
 
 type AudioEngineModule = typeof import("@splayer/audio-engine");

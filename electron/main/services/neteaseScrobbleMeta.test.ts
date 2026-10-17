@@ -16,7 +16,7 @@ const track: Track = {
   fee: 1,
 };
 
-describe("网易云听歌打卡元数据", () => {
+describe("NCM 听歌打卡元数据", () => {
   it("短音频也会在播放过半后触发打卡", () => {
     assert.equal(neteaseScrobbleThresholdMs(15), 7500);
     assert.equal(neteaseScrobbleThresholdMs(30), 15000);
@@ -131,7 +131,7 @@ describe("网易云听歌打卡元数据", () => {
     assert.equal(value?.sourceType, "song");
   });
 
-  it("应用页面来源不改变网易云打卡来源", () => {
+  it("应用页面来源不改变 NCM 打卡来源", () => {
     const value = toNeteaseScrobbleTrack(
       track,
       { originId: "cloud", originType: "page", originName: "我的云盘" },

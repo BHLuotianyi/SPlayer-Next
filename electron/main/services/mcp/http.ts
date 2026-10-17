@@ -6,7 +6,8 @@ import { store } from "@main/store";
 import { broadcast } from "@main/utils/broadcast";
 import { serverLog } from "@main/utils/logger";
 import type { McpClientConfigParams, McpStatus } from "@shared/types/settings";
-import { createMcpEndpoint, type McpEndpoint } from "./server";
+import { createMcpEndpoint } from "./server";
+import type { McpEndpoint } from "./endpoint";
 
 let runningServer: Server | null = null;
 let runningEndpoint: McpEndpoint | null = null;

@@ -1,7 +1,7 @@
 /**
  * 听歌打卡
  *
- * 更新网易云听歌排行数据，需要登录态。
+ * 更新 NCM 听歌排行数据，需要登录态
  */
 
 import { createOption } from "../core/option";

@@ -89,7 +89,7 @@ const isNewerVersion = (remote: string, current: string): boolean => {
   return false;
 };
 
-interface PluginRuntime {
+export interface PluginRuntime {
   manifest: PluginManifest;
   enabled: boolean;
   status: PluginStatus;
@@ -717,4 +717,3 @@ class PluginRegistry extends EventEmitter {
 }
 
 export const pluginRegistry = new PluginRegistry();
-export type { PluginRuntime };

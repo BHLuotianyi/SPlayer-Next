@@ -1,7 +1,7 @@
 /**
  * Netease API 主进程服务
  *
- * 直接在 Node 侧实现加解密 + HTTP 调用，不依赖任何网易云服务端 npm 包
+ * 直接在 Node 侧实现加解密 + HTTP 调用，不依赖任何 NCM 服务端 npm 包
  * 加密算法等核心逻辑见 core/crypto.ts
  *
  * 统一入口 `callNetease(name, params)`：
@@ -80,7 +80,7 @@ const NON_CACHEABLE: ReadonlySet<string> = new Set([
   "recommend_songs",
 ]);
 
-/** 无需初始化网易云匿名登录态的公开接口 */
+/** 无需初始化 NCM 匿名登录态的公开接口 */
 const SESSIONLESS: ReadonlySet<string> = new Set(["audio_match"]);
 
 /** 国内 IP 前缀池 */

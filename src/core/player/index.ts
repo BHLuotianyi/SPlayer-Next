@@ -1,8 +1,7 @@
-import type { PlaybackContext, Track } from "@shared/types/player";
+import type { PlaybackContext, RepeatMode, ShuffleMode, Track } from "@shared/types/player";
 import type { TagEditRequest, TagWriteOutcome } from "@shared/types/tagEditor";
-import type { PersonalFmOptions } from "@/types/netease";
+import type { PersonalFmOptions } from "@shared/types/platform/netease";
 import { handleEvent } from "./events";
-import type { RepeatMode, ShuffleMode } from "@/stores/status";
 import { useMediaStore } from "@/stores/media";
 import { useSettingsStore } from "@/stores/settings";
 import { useStatusStore } from "@/stores/status";
@@ -693,7 +692,7 @@ export const saveTrackTags = async (edits: TagEditRequest[]): Promise<TagWriteOu
 
 /**
  * 进入心动模式：用智能推荐列表替换队列并从头播放
- * @param tracks - 网易云智能推荐曲目
+ * @param tracks - NCM 智能推荐曲目
  */
 export const playHeartMode = async (tracks: readonly Track[]): Promise<void> => {
   if (tracks.length === 0) return;
