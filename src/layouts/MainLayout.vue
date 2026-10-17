@@ -4,8 +4,10 @@ import { useMediaStore } from "@/stores/media";
 import { useSettingsStore } from "@/stores/settings";
 import { useOrpheusProtocol } from "@/composables/useOrpheusProtocol";
 import { useExternalFileHandler } from "@/composables/useExternalFileHandler";
+import { coverTransitionActive, installCoverTransitions } from "@/services/coverTransition";
 
 const route = useRoute();
+const router = useRouter();
 const status = useStatusStore();
 const settings = useSettingsStore();
 
@@ -38,10 +40,12 @@ const routeTransitionName = computed(() => {
   return transition === "none" ? "" : `route-${transition}`;
 });
 
-/** 路由 key */
+/** 详情按路径和服务器隔离实例，列表沿用父路由缓存 */
 const routeKey = computed(() => {
   const hasParam = route.matched.some((m) => m.path.includes(":"));
-  return hasParam ? route.path : (route.matched[1]?.path ?? route.path);
+  return hasParam
+    ? `${route.path}:${route.query.serverId ?? ""}`
+    : (route.matched[1]?.path ?? route.path);
 });
 
 /** 需要受控缓存的页面组件白名单 */
@@ -77,12 +81,25 @@ watch(
   },
 );
 
-// 路由切换完成后恢复滚动位置
+/** 路由切换完成后恢复主内容区滚动位置 */
 const handleAfterEnter = (): void => {
   if (!mainContainerRef.value) return;
   const saved = mainScrollMap.get(route.fullPath) ?? 0;
   mainContainerRef.value.scrollTop = saved;
 };
+
+let disposeCoverTransitions: (() => void) | undefined;
+watch(
+  () => appearance.seamlessTransition,
+  (enabled) => {
+    disposeCoverTransitions?.();
+    disposeCoverTransitions = enabled
+      ? installCoverTransitions(router, () => mainContainerRef.value, handleAfterEnter)
+      : undefined;
+  },
+  { immediate: true },
+);
+onBeforeUnmount(() => disposeCoverTransitions?.());
 
 /** 侧边栏样式 */
 const sidebarClass = computed(() => {
@@ -150,9 +167,18 @@ const playerBarInnerClass = computed(() => {
       </header>
 
       <!-- 主内容区 -->
-      <main ref="mainContainerRef" class="flex-1 overflow-y-auto overflow-x-hidden">
+      <main
+        ref="mainContainerRef"
+        class="flex-1 overflow-y-auto overflow-x-hidden"
+        :data-cover-transition="coverTransitionActive ? '' : undefined"
+      >
         <RouterView v-slot="{ Component }">
-          <Transition :name="routeTransitionName" mode="out-in" @after-enter="handleAfterEnter">
+          <Transition
+            :name="routeTransitionName"
+            :css="!coverTransitionActive"
+            :mode="coverTransitionActive ? undefined : 'out-in'"
+            @after-enter="handleAfterEnter"
+          >
             <KeepAlive :max="10" :include="cachedViews">
               <component :is="Component" :key="routeKey" />
             </KeepAlive>
@@ -193,3 +219,21 @@ const playerBarInnerClass = computed(() => {
   <!-- 输出信息弹窗 -->
   <AudioInfoDialog />
 </template>
+
+<style scoped>
+:deep([data-cover-shared]) {
+  view-transition-name: detail-cover;
+}
+
+main[data-cover-transition]::view-transition-group(detail-cover) {
+  animation-duration: 320ms;
+  animation-timing-function: cubic-bezier(0.2, 0, 0, 1);
+  overflow: clip;
+  border-radius: var(--cover-transition-radius);
+}
+
+main[data-cover-transition]::view-transition-old(detail-cover),
+main[data-cover-transition]::view-transition-new(detail-cover) {
+  height: 100%;
+}
+</style>

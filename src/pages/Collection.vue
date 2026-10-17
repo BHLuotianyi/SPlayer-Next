@@ -9,14 +9,11 @@ import { useCollectionSubscribe } from "@/composables/collection/useCollectionSu
 import { usePlaylistManage } from "@/composables/collection/usePlaylistManage";
 import SongList from "@/components/list/SongList.vue";
 import { formatTime } from "@/utils/time";
+import { coverTransitionActive, getCoverPreview } from "@/services/coverTransition";
 import * as player from "@/core/player";
 import IconLucidePencil from "~icons/lucide/pencil";
 import IconLucideTrash2 from "~icons/lucide/trash-2";
 import IconLucideListChecks from "~icons/lucide/list-checks";
-import IconLucideListMusic from "~icons/lucide/list-music";
-import IconLucideHourglass from "~icons/lucide/hourglass";
-import IconLucideCalendar from "~icons/lucide/calendar";
-import IconLucideUser from "~icons/lucide/user";
 import IconMoreHorizontal from "~icons/lucide/more-horizontal";
 import IconCopy from "~icons/lucide/copy";
 
@@ -30,6 +27,12 @@ const type = route.params.type as CollectionType;
 const id = route.params.id as string;
 
 const collection = shallowRef<Collection | null>(null);
+const preview = getCoverPreview(route.fullPath);
+/** 首屏头部只复用轻量摘要，不将预览数据交给播放和歌单管理逻辑 */
+const header = computed(() => collection.value ?? preview);
+const coverSource = computed(() =>
+  coverTransitionActive.value && preview ? preview.cover : (header.value?.cover ?? preview?.cover),
+);
 /** 正在加载 */
 const loading = ref(false);
 /** 错误信息 */
@@ -244,15 +247,17 @@ onBeforeUnmount(() => {
 <template>
   <div class="flex flex-col h-full">
     <!-- 头部信息 -->
-    <div v-if="collection" class="shrink-0 px-5 pb-2">
+    <div v-if="header" class="shrink-0 px-5 pb-2">
       <div
         class="flex mt-2 transition-[gap,margin] duration-300"
         :class="collapsed ? 'gap-3' : 'gap-5'"
       >
         <!-- 封面 -->
-        <SImg
-          :src="collection.cover"
-          :alt="collection.title"
+        <DetailCover
+          :src="coverSource"
+          :fallback="preview?.cover"
+          :alt="header.title"
+          data-cover-hero
           class="rounded-xl shrink-0 transition-[width,height] duration-300"
           :class="collapsed ? 'size-20' : 'size-40'"
         />
@@ -267,7 +272,7 @@ onBeforeUnmount(() => {
                 class="min-w-0 flex-1 font-bold text-on-surface truncate lh-normal transition-[font-size,line-height] duration-300"
                 :class="collapsed ? 'text-xl' : 'text-3xl'"
               >
-                {{ collection.title }}
+                {{ header.title }}
               </h1>
               <div
                 class="flex shrink-0 items-center gap-1 text-primary"
@@ -299,7 +304,7 @@ onBeforeUnmount(() => {
               <div class="overflow-hidden flex flex-col gap-2">
                 <!-- 简介 -->
                 <SButton
-                  v-if="collection.description"
+                  v-if="collection?.description"
                   variant="text"
                   size="auto"
                   block
@@ -315,7 +320,7 @@ onBeforeUnmount(() => {
                   </span>
                 </SButton>
                 <p v-else class="text-sm text-on-surface-variant/70 truncate">
-                  {{ t("collection.noDescription") }}
+                  {{ t(collection ? "collection.noDescription" : "common.loading") }}
                 </p>
                 <div
                   class="flex items-center gap-3 text-sm leading-none text-on-surface-variant/50"
@@ -326,7 +331,11 @@ onBeforeUnmount(() => {
                   </span>
                   <span class="flex items-center gap-1 shrink-0">
                     <IconLucideListMusic class="shrink-0" />
-                    {{ t("common.totalSongs", { count: collection.tracks.length }) }}
+                    {{
+                      t("common.totalSongs", {
+                        count: collection?.tracks.length ?? preview?.trackCount ?? 0,
+                      })
+                    }}
                   </span>
                   <span v-if="totalDuration" class="flex items-center gap-1 shrink-0">
                     <IconLucideHourglass class="shrink-0" />
@@ -347,7 +356,7 @@ onBeforeUnmount(() => {
                 type="primary"
                 variant="secondary"
                 round
-                :disabled="collection.tracks.length === 0"
+                :disabled="!collection?.tracks.length"
                 @click="handlePlayAll"
               >
                 <template #icon>
@@ -375,7 +384,7 @@ onBeforeUnmount(() => {
                 }}
               </SButton>
               <SDropdownMenu
-                v-if="moreMenuItems.length > 0"
+                v-if="collection && moreMenuItems.length > 0"
                 :items="moreMenuItems"
                 align="start"
                 @select="handleMoreMenu"
