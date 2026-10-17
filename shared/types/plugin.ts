@@ -3,7 +3,8 @@
  * 用于主进程、预加载、渲染进程、沙箱子进程之间的契约
  */
 
-import type { LyricLine } from "./lyrics";
+import type { LyricLine } from "lyric-kit";
+
 import type { Track, PlayerState, RepeatMode, ShuffleMode } from "./player";
 import type {
   OnlineSearchOptions,

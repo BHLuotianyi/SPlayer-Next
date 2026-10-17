@@ -3,7 +3,8 @@
  */
 
 import type { Track, PlayerState } from "@shared/types/player";
-import type { LyricLine } from "@shared/types/lyrics";
+import type { LyricLine } from "lyric-kit";
+
 import type { PlaybackEventData, PlaybackEventKind } from "@shared/types/plugin";
 import type {
   NowPlayingSnapshot,

@@ -815,7 +815,11 @@
       "showMore": "更多贡献者",
       "collapse": "收起",
       "commit": "提交",
-      "date": "日期"
+      "date": "日期",
+      "dependencies": {
+        "lyrics": "类 Apple Music 歌词显示组件库",
+        "neteaseApi": "NCM API 备份 + 增强"
+      }
     },
     "storeVersion": "Store",
     "language": {

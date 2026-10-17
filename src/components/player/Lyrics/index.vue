@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import type { LyricLine } from "@shared/types/lyrics";
+import type { LyricLine } from "lyric-kit";
+
 import { useSettingsStore } from "@/stores/settings";
 import AMLLLyrics from "./AMLLLyrics.vue";
 import DefaultLyrics from "./DefaultLyrics.vue";

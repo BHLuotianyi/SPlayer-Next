@@ -1,6 +1,7 @@
 import { mount } from "@vue/test-utils";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import type { LyricLine } from "@shared/types/lyrics";
+import type { LyricLine } from "lyric-kit";
+
 import { nextTick } from "vue";
 import { useSettingsStore } from "@/stores/settings";
 import DefaultLyrics from "./DefaultLyrics.vue";

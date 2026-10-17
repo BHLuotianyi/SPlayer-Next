@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import type { LyricLine } from "@shared/types/lyrics";
+import type { LyricLine } from "lyric-kit";
+
 import { DEFAULTS, type LyricAlignment, type SpringParams, LyricRenderer } from "lyric-dom";
 import "lyric-dom/renderer.css";
 import LyricCredit from "./LyricCredit.vue";

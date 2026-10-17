@@ -815,7 +815,11 @@
       "showMore": "More Contributors",
       "collapse": "Collapse",
       "commit": "Commit",
-      "date": "Date"
+      "date": "Date",
+      "dependencies": {
+        "lyrics": "Apple Music-style lyrics display library",
+        "neteaseApi": "NCM API backup and enhancements"
+      }
     },
     "storeVersion": "Store",
     "language": {

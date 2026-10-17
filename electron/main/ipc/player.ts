@@ -52,7 +52,7 @@ import type {
   PlayerState,
   TransitionPreference,
 } from "@shared/types/player";
-import type { MediaEvent } from "@main/services/media";
+import type { MediaEvent } from "@splayer/media-ctrl";
 import { JsPlayerEvent } from "@splayer/audio-engine";
 import type { JsMusicMetadata } from "@splayer/audio-engine";
 
