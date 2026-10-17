@@ -37,6 +37,7 @@ const handleLoad = async (event: Event): Promise<void> => {
       :src="fallback"
       :alt="alt"
       class="absolute inset-0 size-full object-cover"
+      decoding="async"
     />
     <img
       v-if="src"

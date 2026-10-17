@@ -18,7 +18,6 @@ let dispose: (() => void) | undefined;
  */
 const setupNavigation = async () => {
   vi.spyOn(document, "hidden", "get").mockReturnValue(false);
-  vi.spyOn(window, "matchMedia").mockReturnValue({ matches: false } as MediaQueryList);
   vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockReturnValue(
     new DOMRect(0, 0, 160, 160),
   );

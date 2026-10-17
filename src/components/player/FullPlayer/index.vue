@@ -14,6 +14,11 @@ import { useProgressLyric } from "@/composables/useProgressLyric";
 import Lyrics from "@/components/player/Lyrics/index.vue";
 import { useWindowControls } from "@/composables/useWindowControls";
 import * as player from "@/core/player";
+import {
+  playerTransition,
+  playerTransitionActive,
+  setPlayerExpanded,
+} from "@/services/playerTransition";
 
 const status = useStatusStore();
 const media = useMediaStore();
@@ -39,11 +44,13 @@ const { snapToNearestLyric } = useProgressLyric();
 
 const lyricRef = ref<InstanceType<typeof Lyrics>>();
 const lyricMounted = ref(false);
+const lyricReady = ref(false);
 const playerVisible = ref(false);
 const visualizerMounted = ref(false);
 const initialLyricTimeMs = ref(0);
-let visualizerMountFrame = 0;
+let visualizerIdle = 0;
 let enterPrepared = false;
+const visibility = useDocumentVisibility();
 
 /** 加载中的歌曲使用队列当前项兜底，避免全屏播放器出现空白 */
 const displayTrack = computed(() => media.track ?? status.currentTrack);
@@ -57,7 +64,44 @@ const { start: startTick, stop: stopTick } = usePlaybackTime((currentMs) => {
   }
 });
 
-/** 每次展开只准备一次内容，减弱动画时提前挂载以融入面板过渡 */
+/** 歌词首帧就绪后在空闲时段创建可视化，避免布局测量与 WebGL 初始化争抢一帧 */
+const scheduleVisualizers = (): void => {
+  if (
+    visualizerIdle ||
+    visualizerMounted.value ||
+    playerTransitionActive.value ||
+    !isPlayerExpanded.value ||
+    visibility.value !== "visible"
+  ) {
+    return;
+  }
+  visualizerIdle = requestIdleCallback(
+    () => {
+      visualizerIdle = 0;
+      if (
+        isPlayerExpanded.value &&
+        !playerTransitionActive.value &&
+        visibility.value === "visible"
+      ) {
+        visualizerMounted.value = true;
+      }
+    },
+    { timeout: 500 },
+  );
+};
+
+/** 歌词完成首次布局后安排可视化初始化 */
+const onLyricReady = (): void => {
+  if (!isPlayerExpanded.value) return;
+  lyricReady.value = true;
+  scheduleVisualizers();
+};
+
+watch(visibility, (value) => {
+  if (value === "visible" && lyricReady.value) scheduleVisualizers();
+});
+
+/** 每次展开只初始化一次歌词，复用已挂载内容处理快速收起再展开 */
 const preparePlayerContent = (): void => {
   if (enterPrepared) return;
   enterPrepared = true;
@@ -68,39 +112,70 @@ const preparePlayerContent = (): void => {
     lyricRef.value?.setCurrentTime(getCurrentTime() + status.lyricOffsetMs);
     lyricRef.value?.resume();
     startTick();
-    // 将 WebGL 和频谱创建与歌词 DOM 测量错开
-    visualizerMountFrame = requestAnimationFrame(() => {
-      visualizerMountFrame = requestAnimationFrame(() => {
-        visualizerMountFrame = 0;
-        if (isPlayerExpanded.value) visualizerMounted.value = true;
-      });
-    });
+    if (lyricReady.value) scheduleVisualizers();
+    else if (!hasLyric.value) onLyricReady();
   });
 };
 
-/** 展开前显示背景，并在轻量过渡期间准备歌词与可视化内容 */
+/** 展开前仅显示静态背景与封面 */
 const onBeforeEnter = (): void => {
   playerVisible.value = true;
   enterPrepared = false;
-  if (settings.reducedMotion) preparePlayerContent();
 };
 
-/** 收起前 */
+/** 普通过渡完成后准备内容，共享过渡由快照就绪驱动 */
+const onAfterEnter = (): void => {
+  if (!playerTransitionActive.value) preparePlayerContent();
+};
+
+watch(
+  playerTransition,
+  (active, previous, onCleanup) => {
+    if (!active) {
+      if (previous && isPlayerExpanded.value) {
+        preparePlayerContent();
+        if (lyricReady.value) scheduleVisualizers();
+      }
+      return;
+    }
+    let cancelled = false;
+    let idle = 0;
+    onCleanup(() => {
+      cancelled = true;
+      cancelIdleCallback(idle);
+    });
+    // 快照完成后再用空闲时段创建歌词，避免阻塞过渡的首帧
+    void active.ready.then(
+      () => {
+        if (cancelled || !isPlayerExpanded.value) return;
+        idle = requestIdleCallback(() => {
+          idle = 0;
+          if (isPlayerExpanded.value) preparePlayerContent();
+        });
+      },
+      () => {},
+    );
+  },
+  { immediate: true },
+);
+
+/** 收起前取消可视化初始化并冻结歌词 */
 const onBeforeLeave = () => {
-  cancelAnimationFrame(visualizerMountFrame);
-  visualizerMountFrame = 0;
+  cancelIdleCallback(visualizerIdle);
+  visualizerIdle = 0;
   lyricRef.value?.freeze();
   stopTick();
 };
 
-/** 收起后 */
+/** 收起结束后卸载歌词与可视化 */
 const onAfterLeave = () => {
   playerVisible.value = false;
   lyricMounted.value = false;
+  lyricReady.value = false;
   visualizerMounted.value = false;
 };
 
-onBeforeUnmount(() => cancelAnimationFrame(visualizerMountFrame));
+onBeforeUnmount(() => cancelIdleCallback(visualizerIdle));
 
 // 重新挂载时，刷新初始时间
 watch(hasLyric, (value) => {
@@ -175,10 +250,6 @@ const onDownloadSelect = (key: string): void => {
   void enqueueDownload(displayTrack.value, key ? { quality: key as QualityLevel } : {});
 };
 
-const collapse = (): void => {
-  isPlayerExpanded.value = false;
-};
-
 const onSeekDragEnd = (value: number): void => {
   player.seek(snapToNearestLyric(value));
 };
@@ -213,11 +284,12 @@ const showComments = (): void => {
   <Teleport to="body">
     <Transition
       appear
+      :css="!playerTransitionActive"
       enter-active-class="transition-transform duration-500 ease-[cubic-bezier(0.7,0,0.3,1)]"
       leave-active-class="transition-transform duration-500 ease-[cubic-bezier(0.7,0,0.3,1)]"
       enter-from-class="translate-y-full"
       leave-to-class="translate-y-full"
-      @after-enter="preparePlayerContent"
+      @after-enter="onAfterEnter"
       @before-enter="onBeforeEnter"
       @before-leave="onBeforeLeave"
       @after-leave="onAfterLeave"
@@ -345,6 +417,7 @@ const showComments = (): void => {
                 :initial-time="initialLyricTimeMs"
                 :playing="isPlaying"
                 @seek="handleLyricSeek"
+                @ready="onLyricReady"
               />
               <div
                 v-else-if="lyricMounted"
@@ -382,7 +455,13 @@ const showComments = (): void => {
           @mouseleave="onBarLeave"
         >
           <div class="flex-1 min-w-0 flex items-center justify-start gap-2">
-            <SButton type="cover" variant="ghost" size="large" circle @click="collapse">
+            <SButton
+              type="cover"
+              variant="ghost"
+              size="large"
+              circle
+              @click="setPlayerExpanded(false)"
+            >
               <template #icon><IconLucideChevronDown /></template>
             </SButton>
             <SButton

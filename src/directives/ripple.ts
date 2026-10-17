@@ -15,7 +15,7 @@ interface RippleElement extends HTMLElement {
 }
 
 /**
- * 注册按压涟漪，减弱动画时跳过节点创建与动画调度
+ * 注册元素的按压涟漪
  * @param el - 绑定涟漪的元素
  */
 const setupRipple = (el: RippleElement) => {
@@ -27,6 +27,10 @@ const setupRipple = (el: RippleElement) => {
   }
   el.style.overflow = "hidden";
 
+  /**
+   * 按压时创建涟漪，减弱动画时跳过节点与动画调度
+   * @param e - 指针按压事件
+   */
   const handler = (e: PointerEvent) => {
     if (document.documentElement.hasAttribute("data-reduced-motion")) return;
     const rect = el.getBoundingClientRect();

@@ -5,6 +5,11 @@ import { useSettingsStore } from "@/stores/settings";
 import { useOrpheusProtocol } from "@/composables/useOrpheusProtocol";
 import { useExternalFileHandler } from "@/composables/useExternalFileHandler";
 import { coverTransitionActive, installCoverTransitions } from "@/services/coverTransition";
+import {
+  fullPlayerReady,
+  playerTransitionActive,
+  cancelPlayerTransition,
+} from "@/services/playerTransition";
 
 const route = useRoute();
 const router = useRouter();
@@ -20,7 +25,6 @@ const showPlayerBar = computed(() => !!useMediaStore().track);
 const { isPlayerExpanded } = storeToRefs(status);
 
 /** 播放页展开状态同步与懒加载 */
-const fullPlayerReady = ref(false);
 const FullPlayer = defineAsyncComponent(() => import("@/components/player/FullPlayer/index.vue"));
 const fullPlayerLoaded = ref(isPlayerExpanded.value);
 watch(
@@ -31,7 +35,6 @@ watch(
   },
   { immediate: true },
 );
-onBeforeUnmount(() => window.api.window.setPlayerExpanded(false));
 const { appearance } = settings;
 
 /** 路由切换动效 */
@@ -92,6 +95,7 @@ let disposeCoverTransitions: (() => void) | undefined;
 watch(
   () => appearance.seamlessTransition && !settings.reducedMotion,
   (enabled) => {
+    if (!enabled) cancelPlayerTransition();
     disposeCoverTransitions?.();
     disposeCoverTransitions = enabled
       ? installCoverTransitions(router, () => mainContainerRef.value, handleAfterEnter)
@@ -99,7 +103,12 @@ watch(
   },
   { immediate: true },
 );
-onBeforeUnmount(() => disposeCoverTransitions?.());
+onBeforeUnmount(() => {
+  window.api.window.setPlayerExpanded(false);
+  disposeCoverTransitions?.();
+  cancelPlayerTransition();
+  fullPlayerReady.value = false;
+});
 
 /** 侧边栏样式 */
 const sidebarClass = computed(() => {
@@ -149,6 +158,7 @@ const playerBarInnerClass = computed(() => {
   <!-- 主界面 -->
   <div
     class="player-shell h-screen flex overflow-hidden bg-app text-on-surface transition-[transform,opacity] duration-500 ease-[cubic-bezier(0.7,0,0.3,1)] origin-center"
+    :style="playerTransitionActive ? { transition: 'none' } : undefined"
     :class="isPlayerExpanded && fullPlayerReady ? 'scale-95 opacity-0 pointer-events-none' : ''"
   >
     <!-- 侧边栏 -->
@@ -235,5 +245,42 @@ main[data-cover-transition]::view-transition-group(detail-cover) {
 main[data-cover-transition]::view-transition-old(detail-cover),
 main[data-cover-transition]::view-transition-new(detail-cover) {
   height: 100%;
+}
+</style>
+
+<style>
+html[data-player-transition] {
+  [data-player-shared] {
+    view-transition-name: player-cover;
+  }
+
+  [data-player-cover="bar"] + div {
+    visibility: hidden;
+  }
+
+  &::view-transition-group(*) {
+    animation-duration: 320ms;
+    animation-timing-function: cubic-bezier(0.2, 0, 0, 1);
+  }
+
+  &::view-transition-image-pair(player-cover) {
+    overflow: clip;
+    animation: player-cover-radius 320ms cubic-bezier(0.2, 0, 0, 1) both;
+  }
+
+  &::view-transition-old(player-cover),
+  &::view-transition-new(player-cover) {
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+@keyframes player-cover-radius {
+  from {
+    border-radius: var(--player-cover-from-radius);
+  }
+  to {
+    border-radius: var(--player-cover-to-radius);
+  }
 }
 </style>

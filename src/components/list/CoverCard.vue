@@ -88,11 +88,11 @@ const actualFallback = computed(() => (props.type === "artist" ? artistFallback 
 [data-cover-shared] {
   transform: none !important;
   filter: none !important;
-  transition: none !important;
+  transition: none;
 }
 
 [data-cover-shared] + [data-cover-action] {
   opacity: 0 !important;
-  transition: none !important;
+  transition: none;
 }
 </style>

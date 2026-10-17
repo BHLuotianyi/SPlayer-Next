@@ -106,13 +106,7 @@ export const installCoverTransitions = (
   const removeBeforeResolve = router.beforeResolve(async (to) => {
     const current = navigation;
     const scope = getScope();
-    if (
-      to !== targetRoute ||
-      !current ||
-      !scope?.startViewTransition ||
-      document.hidden ||
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches
-    ) {
+    if (to !== targetRoute || !current || !scope?.startViewTransition || document.hidden) {
       return;
     }
 
