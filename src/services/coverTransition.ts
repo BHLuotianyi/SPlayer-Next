@@ -7,27 +7,37 @@ type TransitionScope = HTMLElement & Partial<Pick<Document, "startViewTransition
 
 /** 只保留一次导航的头部摘要，不缓存歌曲和页面 DOM */
 interface CoverNavigation {
-  coverId: string;
+  coverKey: string;
   header: CoverPreview;
   listPath: string;
   detailPath: string;
 }
 
-let pendingCover: Pick<CoverNavigation, "coverId" | "header"> | null = null;
+let pendingCover: Pick<CoverNavigation, "coverKey" | "header"> | null = null;
 let preview: CoverNavigation | null = null;
 let captureEnabled = false;
 
 export const coverTransitionActive = shallowRef(false);
 
 /**
+ * 按稳定标识查找封面，卡片重新挂载后仍能匹配
+ * 标识只含媒体类型与 ID，页面与服务器身份由 listPath 校验和主内容区作用域保证
+ * @param scope - 主内容容器
+ * @param key - 卡片声明的稳定标识
+ * @returns 当前页面内的封面元素
+ */
+const findCover = (scope: HTMLElement, key: string): HTMLElement | null =>
+  scope.querySelector<HTMLElement>(`[data-cover-key="${key}"]`);
+
+/**
  * 记录本次点击的封面，路由守卫只在当前事件引发详情跳转时消费
  * @param item - 卡片摘要
- * @param coverId - 封面元素 ID
+ * @param coverKey - 卡片的稳定标识，不能使用组件实例 ID
  */
-export const captureCover = (item: CoverItem, coverId: string): void => {
+export const captureCover = (item: CoverItem, coverKey: string): void => {
   if (!captureEnabled || !item.cover) return;
   const captured = {
-    coverId,
+    coverKey,
     header: {
       title: item.title,
       cover: item.cover,
@@ -112,7 +122,7 @@ export const installCoverTransitions = (
 
     const entering = to.fullPath === current.detailPath;
     const cover = entering
-      ? document.getElementById(current.coverId)
+      ? findCover(scope, current.coverKey)
       : scope.querySelector<HTMLElement>("[data-cover-hero]");
     const image = cover?.querySelector<HTMLImageElement>("img[data-cover-image]");
     if (!cover || !scope.contains(cover) || !image?.complete || !image.naturalWidth) return;
@@ -161,7 +171,9 @@ export const installCoverTransitions = (
     const entering = to.fullPath === current.detailPath;
     const cover = entering
       ? scope?.querySelector<HTMLElement>("[data-cover-hero]")
-      : document.getElementById(current.coverId);
+      : scope
+        ? findCover(scope, current.coverKey)
+        : null;
     if (cover && scope?.contains(cover)) {
       const bounds = cover.getBoundingClientRect();
       const viewport = scope.getBoundingClientRect();

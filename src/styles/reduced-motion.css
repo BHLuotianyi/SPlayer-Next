@@ -1,5 +1,7 @@
 html[data-reduced-motion] {
   :is(.transition, .transition-all, .transition-transform, [class*="transition-["]) {
+    /* 只保留透明度过渡，位移与缩放直接到位 */
+    transition-property: opacity;
     transition-duration: 150ms;
     transition-delay: 0s;
   }

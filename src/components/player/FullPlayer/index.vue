@@ -177,11 +177,14 @@ const onAfterLeave = () => {
 
 onBeforeUnmount(() => cancelIdleCallback(visualizerIdle));
 
-// 重新挂载时，刷新初始时间
+// 重新挂载时，刷新初始时间；加载结束仍无歌词时歌词组件会卸载，按就绪处理
 watch(hasLyric, (value) => {
-  if (value && lyricMounted.value) {
+  if (!lyricMounted.value) return;
+  if (value) {
     initialLyricTimeMs.value = getCurrentTime() + status.lyricOffsetMs;
+    return;
   }
+  onLyricReady();
 });
 
 // 歌词变化时先推送精确时间

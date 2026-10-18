@@ -46,7 +46,7 @@ const setupNavigation = async () => {
       scope.innerHTML =
         to.name === "collection" || to.name === "artist"
           ? "<div data-cover-hero><img data-cover-image></div>"
-          : '<div id="cover"><img data-cover-image></div>';
+          : '<div data-cover-key="cover"><img data-cover-image></div>';
     }
   });
   await router.push("/");
@@ -80,7 +80,9 @@ describe("封面共享过渡回归", () => {
       await router.push("/");
       await flushPromises();
       expect(start).toHaveBeenCalledTimes(2);
-      expect(document.getElementById("cover")!.hasAttribute("data-cover-shared")).toBe(true);
+      expect(
+        scope.querySelector('[data-cover-key="cover"]')!.hasAttribute("data-cover-shared"),
+      ).toBe(true);
       start.mock.results[1].value.skipTransition();
       await flushPromises();
       await router.push(target.replace("server-a", "server-b"));

@@ -20,11 +20,12 @@ const props = withDefaults(defineProps<CoverCardProps>(), {
 });
 
 const emit = defineEmits<{ click: [] }>();
-const coverId = useId();
+/** 稳定的封面标识：页面重新挂载后仍能匹配，不能用组件实例 ID */
+const coverKey = computed(() => `${props.type}:${props.item.id}`);
 
 /** 记录封面后分发点击，由实际目标路由决定是否启用共享过渡 */
 const handleClick = (): void => {
-  captureCover(props.item, coverId);
+  captureCover(props.item, coverKey.value);
   emit("click");
 };
 
@@ -41,7 +42,7 @@ const actualFallback = computed(() => (props.type === "artist" ? artistFallback 
     <!-- 封面 -->
     <div class="relative overflow-hidden group-hover:will-change-transform" :class="coverRounded">
       <SImg
-        :id="coverId"
+        :data-cover-key="coverKey"
         :src="item.cover"
         :fallback="actualFallback"
         :alt="item.title"

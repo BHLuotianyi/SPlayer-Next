@@ -8,6 +8,16 @@ const props = withDefaults(defineProps<SImgProps>(), {
 });
 
 const loaded = ref(false);
+/** 缩略图本身失效时退回内置占位图，避免播放器持续显示破图 */
+const fallbackSrc = ref(props.fallback || defaultFallback);
+
+watch(
+  () => props.fallback,
+  (value) => {
+    fallbackSrc.value = value || defaultFallback;
+  },
+);
+
 watch(
   () => props.src,
   () => {
@@ -28,16 +38,22 @@ const handleLoad = async (event: Event): Promise<void> => {
   }
   if (image.getAttribute("src") === props.src) loaded.value = true;
 };
+
+/** 兜底图加载失败时改用内置占位图 */
+const handleFallbackError = (): void => {
+  if (fallbackSrc.value !== defaultFallback) fallbackSrc.value = defaultFallback;
+};
 </script>
 
 <template>
   <div class="relative isolate overflow-hidden">
     <img
       v-if="!loaded"
-      :src="fallback"
+      :src="fallbackSrc"
       :alt="alt"
       class="absolute inset-0 size-full object-cover"
       decoding="async"
+      @error="handleFallbackError"
     />
     <img
       v-if="src"
