@@ -1,6 +1,5 @@
 /** 注入平台会话、路由业务接口并管理有界响应缓存 */
 
-import { hostname, userInfo } from "node:os";
 import {
   clearSessionCookies,
   getSessionCookies,
@@ -48,6 +47,7 @@ const NON_CACHEABLE: ReadonlySet<string> = new Set([
   "login_status",
   "logout",
   "register_anonimous",
+  "deviceinfo_center_upload",
   "song_url",
   "song_download_url",
   "scrobble",
@@ -274,7 +274,6 @@ export const callNetease = async (
     query.realIP = sessionRealIp();
   }
 
-  const requestDeviceId = (query.cookie as Record<string, string>).deviceId || getDeviceId();
   const requestSessionVersion = sessionVersion;
   const res = await fn(query, createRequest);
   /** 旧会话的响应不能覆盖登出或切换账号后的凭据与缓存 */
@@ -293,34 +292,6 @@ export const callNetease = async (
     if (Object.keys(patch).length) {
       persistSession({ ...loadSession(), ...patch });
       cacheClear();
-    }
-
-    if (
-      process.platform === "win32" &&
-      name === "login_qr_check" &&
-      Number(res.body.code) === 803
-    ) {
-      // 使用本次登录的凭据快照，避免异步上报误用随后切换的账号。
-      const cookie = {
-        ...(query.cookie as Record<string, string>),
-        deviceId: requestDeviceId,
-        ...patch,
-      };
-      void (async () => {
-        try {
-          const deviceName = `${userInfo().username} 的 ${hostname()}`;
-          const result = await createRequest(
-            "/api/deviceinfo/center/upload",
-            { deviceName },
-            { crypto: "eapi", cookie, realIP: query.realIP, ip: query.ip },
-          );
-          if (result.status !== 200 || Number(result.body.code) !== 200) {
-            neteaseLog.warn("登录设备名称上报未成功");
-          }
-        } catch {
-          neteaseLog.warn("登录设备名称上报失败");
-        }
-      })();
     }
   }
 
