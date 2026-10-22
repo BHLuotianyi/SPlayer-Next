@@ -35,6 +35,7 @@ watch(
   },
   { immediate: true },
 );
+
 const { appearance } = settings;
 
 /** 路由切换动效 */
@@ -254,18 +255,22 @@ html[data-player-transition] {
     view-transition-name: player-cover;
   }
 
-  [data-player-cover="bar"] + div {
+  [data-player-cover-overlay] {
     visibility: hidden;
   }
 
+  [data-player-cover="full"] {
+    box-shadow: none;
+  }
+
   &::view-transition-group(*) {
-    animation-duration: 320ms;
+    animation-duration: 450ms;
     animation-timing-function: cubic-bezier(0.2, 0, 0, 1);
   }
 
   &::view-transition-image-pair(player-cover) {
     overflow: clip;
-    animation: player-cover-radius 320ms cubic-bezier(0.2, 0, 0, 1) both;
+    animation: player-cover-radius 450ms cubic-bezier(0.2, 0, 0, 1) both;
   }
 
   &::view-transition-old(player-cover),
