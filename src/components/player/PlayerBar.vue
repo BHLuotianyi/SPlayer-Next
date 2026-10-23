@@ -97,6 +97,7 @@ const { items: menuItems, handleSelect: onMenuSelect } = useTrackMenu(toRef(medi
       </div>
       <SSlider
         :model-value="position"
+        :glow="status.transitioning"
         :min="0"
         :max="duration"
         :step="100"
@@ -118,6 +119,7 @@ const { items: menuItems, handleSelect: onMenuSelect } = useTrackMenu(toRef(medi
     <div class="absolute left-0 right-0 top-0 -translate-y-1/2 z-10">
       <SSlider
         :model-value="position"
+        :glow="status.transitioning"
         :min="0"
         :max="duration"
         :step="100"
