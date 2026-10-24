@@ -761,6 +761,7 @@
       "update": "更新",
       "language": "语言",
       "playControl": "播放控制",
+      "playBehavior": "播放行为",
       "playbackTransition": "播放过渡",
       "audioSource": "播放音源",
       "scrobble": "听歌打卡",
@@ -866,8 +867,14 @@
       "description": "启动时恢复上次歌曲的播放进度"
     },
     "searchPlayBehavior": {
-      "label": "搜索页播放行为",
-      "description": "设置在搜索页面双击歌曲时的播放与添加策略",
+      "label": "搜索页播放",
+      "description": "配置搜索页面双击歌曲时的行为",
+      "current": "仅播放当前",
+      "all": "播放全部"
+    },
+    "songListPlayBehavior": {
+      "label": "歌曲播放按钮行为",
+      "description": "配置歌曲列表行首播放按钮的行为",
       "current": "仅播放当前",
       "all": "播放全部"
     },

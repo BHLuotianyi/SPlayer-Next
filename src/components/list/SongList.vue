@@ -325,6 +325,27 @@ const onTrackDblClick = (item: Track, index: number): void => {
   void player.playFrom(sortedItems.value, { startIndex: index, context: props.playbackContext });
 };
 
+/**
+ * 行首播放按钮点击
+ * @param item - 歌曲数据
+ * @param index - 列表索引
+ */
+const onPlayClick = (item: Track, index: number): void => {
+  if (batch.active.value) {
+    batch.toggle(item.id);
+    return;
+  }
+  if (playingId.value === item.id) {
+    player.togglePlay();
+    return;
+  }
+  if (settings.player.songListPlayBehavior === "all") {
+    void player.playFrom(sortedItems.value, { startIndex: index, context: props.playbackContext });
+    return;
+  }
+  void player.playNow(item, props.playbackContext);
+};
+
 const emit = defineEmits<{
   scroll: [event: Event];
   reachBottom: [];
@@ -583,13 +604,7 @@ defineExpose({
                       ? 'text-primary'
                       : 'text-on-surface-variant'
                 "
-                @click.stop="
-                  batch.active.value
-                    ? batch.toggle(item.id)
-                    : playingId === item.id
-                      ? player.togglePlay()
-                      : player.playNow(item, props.playbackContext)
-                "
+                @click.stop="onPlayClick(item, index)"
               >
                 <!-- 多选模式 -->
                 <SCheckbox

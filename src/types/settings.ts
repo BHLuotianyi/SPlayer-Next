@@ -23,11 +23,11 @@ export type CoverLayout = "default" | "fullscreen";
 export type TimeFormat = "current-total" | "remaining-total" | "current-remaining";
 
 /**
- * 搜索页播放行为
+ * 列表点击播放的行为
  * - current: 仅播放当前
  * - all: 播放全部
  */
-export type SearchPlayBehavior = "current" | "all";
+export type PlayBehavior = "current" | "all";
 
 /**
  * 歌词来源偏好
@@ -280,7 +280,9 @@ export interface PlayerSettings {
   /** 曲尾交接时机与淡化时长偏好 */
   transitionPreference: TransitionPreference;
   /** 搜索页播放行为 */
-  searchPlayBehavior: SearchPlayBehavior;
+  searchPlayBehavior: PlayBehavior;
+  /** 歌曲列表行首播放按钮的行为 */
+  songListPlayBehavior: PlayBehavior;
 }
 
 /** 外观设置 */
