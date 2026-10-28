@@ -78,13 +78,15 @@ const servicesCategory: SettingCategory = {
           type: "switch",
           binding: { store: "settings", path: "system.media.systemMediaControls" },
           defaultValue: true,
-        },
-        {
-          key: "mprisExtendedMetadata",
-          type: "switch",
-          binding: { store: "settings", path: "system.media.mprisExtendedMetadata" },
-          defaultValue: true,
-          visible: () => isLinux,
+          children: [
+            {
+              key: "mprisExtendedMetadata",
+              type: "switch",
+              binding: { store: "settings", path: "system.media.mprisExtendedMetadata" },
+              defaultValue: true,
+              visible: () => isLinux,
+            },
+          ],
         },
       ],
     },

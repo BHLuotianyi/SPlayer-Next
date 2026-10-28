@@ -48,9 +48,9 @@ export interface MetadataParam {
   coverUrl?: string
   /** 时长（毫秒） */
   durationMs?: number
-  /** 歌曲链接 / 媒体地址 (用于 MPRIS xesam:url) */
+  /** 歌曲链接 / 媒体地址（用于 MPRIS xesam:url） */
   url?: string
-  /** 歌词文本 (用于 MPRIS xesam:asText) */
+  /** 歌词文本（用于 MPRIS xesam:asText） */
   lyrics?: string
 }
 
